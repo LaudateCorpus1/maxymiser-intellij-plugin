@@ -1,0 +1,35 @@
+/*
+ * Copyright © 2019 Oracle America Inc. and its affiliates. All rights reserved.
+ *
+ * Licensed under the Universal Permissive License (UPL) v 1.0 as shown at http://oss.oracle.com/licenses/upl/.
+ */
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.8'
+}
+
+group 'com.oracle.maxymiser'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+//  localPath '/Applications/WebStorm.app'
+    version '2019.1.1'
+}
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}

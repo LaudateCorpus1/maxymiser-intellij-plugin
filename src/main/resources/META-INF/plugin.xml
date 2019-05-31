@@ -1,0 +1,74 @@
+<!--
+  ~ Copyright © 2019 Oracle America Inc. and its affiliates. All rights reserved.
+  ~
+  ~ Licensed under the Universal Permissive License (UPL) v 1.0 as shown at http://oss.oracle.com/licenses/upl/.
+  -->
+
+<idea-plugin>
+    <id>com.oracle.maxymiser.intellij-plugin</id>
+    <name>Oracle Maxymiser: Testing and Personalization</name>
+
+    <vendor url="https://www.oracle.com/marketingcloud/products/testing-and-optimization/">Oracle Maxymiser: Testing and
+        Personalization
+    </vendor>
+
+    <description><![CDATA[
+        Enables editing of Variants, Campaign Scripts and Campaign Actions from within IntelliJ IDEA or WebStorm.
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <idea-version since-build="2019.*"/>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceInterface="com.oracle.maxymiser.intellij.plugin.service.ApplicationSettingsService"
+                serviceImplementation="com.oracle.maxymiser.intellij.plugin.service.impl.ApplicationSettingsServiceImpl"/>
+
+        <applicationService
+                serviceInterface="com.oracle.maxymiser.intellij.plugin.service.RestService"
+                serviceImplementation="com.oracle.maxymiser.intellij.plugin.service.impl.RestServiceImpl"/>
+
+        <applicationService
+                serviceInterface="com.oracle.maxymiser.intellij.plugin.service.PullService"
+                serviceImplementation="com.oracle.maxymiser.intellij.plugin.service.impl.PullServiceImpl"/>
+
+        <applicationService
+                serviceInterface="com.oracle.maxymiser.intellij.plugin.service.PushService"
+                serviceImplementation="com.oracle.maxymiser.intellij.plugin.service.impl.PushServiceImpl"/>
+
+        <applicationService
+                serviceInterface="com.oracle.maxymiser.intellij.plugin.service.UIService"
+                serviceImplementation="com.oracle.maxymiser.intellij.plugin.service.impl.UIServiceImpl"/>
+
+        <applicationService
+                serviceInterface="com.oracle.maxymiser.intellij.plugin.service.TaskManagerService"
+                serviceImplementation="com.oracle.maxymiser.intellij.plugin.service.impl.TaskManagerServiceImpl"/>
+
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable id="com.oracle.maxymiser.intellij.plugin.ui.ApplicationSettings"
+                                 displayName="Oracle Maxymiser"
+                                 instance="com.oracle.maxymiser.intellij.plugin.ui.ApplicationSettings"/>
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <group id="com.oracle.maxymiser.intellij.plugin.actions" text="Oracle Maxymiser" popup="true">
+            <action id="com.oracle.maxymiser.intellij.plugin.actions.PullAction"
+                    class="com.oracle.maxymiser.intellij.plugin.actions.PullAction"
+                    text="Pull"/>
+            <action id="com.oracle.maxymiser.intellij.plugin.actions.PushAction"
+                    class="com.oracle.maxymiser.intellij.plugin.actions.PushAction"
+                    text="Push"/>
+
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </group>
+
+
+    </actions>
+</idea-plugin>
