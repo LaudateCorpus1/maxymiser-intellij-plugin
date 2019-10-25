@@ -27,6 +27,7 @@ dependencies {
 intellij {
 //  localPath '/Applications/WebStorm.app'
     version '2019.1.1'
+    updateSinceUntilBuild false
 }
 patchPluginXml {
     changeNotes """
