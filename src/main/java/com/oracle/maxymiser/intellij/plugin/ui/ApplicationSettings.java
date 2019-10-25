@@ -29,6 +29,7 @@ public class ApplicationSettings implements Configurable {
     private JTextField clientIdTextField;
     private JComboBox<ApplicationSettingsService.Region> regionComboBox;
     private JButton testConnectionButton;
+    private JTextField proxyTextField;
     private final ProgressManager progressManager;
 
     private ApplicationSettingsService applicationSettingsService;
@@ -69,6 +70,10 @@ public class ApplicationSettings implements Configurable {
 
         if (this.regionComboBox.getSelectedItem() != this.applicationSettingsService.getRegion())
             return true;
+
+        if (!StringUtils.equals(this.proxyTextField.getText(), this.applicationSettingsService.getProxy())) {
+            return true;
+        }
         return !StringUtils.equals(new String(this.clientSecretTextField.getPassword()), this.applicationSettingsService.getClientSecret());
 
     }
@@ -80,6 +85,7 @@ public class ApplicationSettings implements Configurable {
         this.applicationSettingsService.setClientId(this.clientIdTextField.getText().trim());
         this.applicationSettingsService.setClientSecret(new String(this.clientSecretTextField.getPassword()).trim());
         this.applicationSettingsService.setRegion((ApplicationSettingsService.Region) this.regionComboBox.getSelectedItem());
+        this.applicationSettingsService.setProxy(this.proxyTextField.getText().trim());
     }
 
     @Override
@@ -89,6 +95,7 @@ public class ApplicationSettings implements Configurable {
         this.clientIdTextField.setText(this.applicationSettingsService.getClientId());
         this.clientSecretTextField.setText(this.applicationSettingsService.getClientSecret());
         this.regionComboBox.setSelectedItem(this.applicationSettingsService.getRegion());
+        this.proxyTextField.setText(this.applicationSettingsService.getProxy());
     }
 
     private void testConnection() {
@@ -101,7 +108,8 @@ public class ApplicationSettings implements Configurable {
                             loginTextField.getText().trim(),
                             new String(passwordTextField.getPassword()).trim(),
                             clientIdTextField.getText().trim(),
-                            new String(clientSecretTextField.getPassword()).trim());
+                            new String(clientSecretTextField.getPassword()).trim(),
+                            proxyTextField.getText());
 
                     return null;
                 }

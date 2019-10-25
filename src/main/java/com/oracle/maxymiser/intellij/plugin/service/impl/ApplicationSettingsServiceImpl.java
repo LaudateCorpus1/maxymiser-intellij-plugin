@@ -27,6 +27,8 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     private String clientId;
     @Property
     private Region region;
+    @Property
+    private String proxy;
 
     @Override
     public void setRegion(Region region) {
@@ -38,36 +40,54 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
         return this.region;
     }
 
+    @Override
     public String getLogin() {
         return login;
     }
 
+    @Override
     public void setLogin(String login) {
         this.login = login;
     }
 
+    @Override
     public String getPassword() {
         return this.getSecure("password");
     }
 
+    @Override
     public void setPassword(String password) {
         this.setSecure("password", password);
     }
 
+    @Override
     public String getClientId() {
         return clientId;
     }
 
+    @Override
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
+    @Override
     public String getClientSecret() {
         return this.getSecure("clientSecret");
     }
 
+    @Override
     public void setClientSecret(String clientSecret) {
         this.setSecure("clientSecret", clientSecret);
+    }
+
+    @Override
+    public String getProxy() {
+        return proxy;
+    }
+
+    @Override
+    public void setProxy(String proxy) {
+        this.proxy = proxy;
     }
 
     private String getSecure(String key) {

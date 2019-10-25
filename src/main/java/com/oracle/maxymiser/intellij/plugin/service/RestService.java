@@ -24,7 +24,7 @@ public interface RestService {
 
     List<CampaignAction> readCampaignActions(String siteId, String campaignId) throws MaxymiserRestException;
 
-    Token authenticate(ApplicationSettingsService.Region region, String login, String password, String clientId, String clientSecret) throws MaxymiserRestException;
+    Token authenticate(ApplicationSettingsService.Region region, String login, String password, String clientId, String clientSecret, String proxy) throws MaxymiserRestException;
 
     void updateCampaignElementVariant(String siteId, String campaignId, String elementId, String variantId, CampaignElementVariant variant) throws MaxymiserRestException;
 

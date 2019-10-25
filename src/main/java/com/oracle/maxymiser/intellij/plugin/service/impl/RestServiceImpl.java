@@ -13,14 +13,14 @@ import com.oracle.maxymiser.intellij.plugin.service.ApplicationSettingsService;
 import com.oracle.maxymiser.intellij.plugin.service.RestService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.HttpClients;
@@ -30,6 +30,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -123,12 +125,14 @@ public class RestServiceImpl implements RestService {
         }
     }
 
-    private <T> T execute(HttpUriRequest request, Class<T> clazz) throws MaxymiserRestException {
+    private <T> T execute(HttpRequestBase request, Class<T> clazz) throws MaxymiserRestException {
         HttpResponse response = null;
         try {
             refreshTokenIfRequired();
 
             request.addHeader("Authorization", String.format("%s %s", this.token.getTokenType(), this.token.getAccessToken()));
+
+            request.setConfig(this.createRequestConfig(applicationSettingsService.getProxy()));
 
             response = this.httpClient.execute(request);
 
@@ -156,7 +160,7 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public Token authenticate(ApplicationSettingsService.Region region, String login, String password, String clientId, String clientSecret) throws MaxymiserRestException {
+    public Token authenticate(ApplicationSettingsService.Region region, String login, String password, String clientId, String clientSecret, String proxy) throws MaxymiserRestException {
         HttpResponse response = null;
         try {
             HttpPost post = new HttpPost(region.getAuthEndpoint() + "/oauth2/v1/tokens");
@@ -169,6 +173,8 @@ public class RestServiceImpl implements RestService {
             post.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             post.addHeader(new BasicScheme().authenticate(new UsernamePasswordCredentials(clientId, clientSecret), post, null));
 
+            post.setConfig(this.createRequestConfig(proxy));
+
             response = httpClient.execute(post);
 
             checkResponse(response);
@@ -176,6 +182,8 @@ public class RestServiceImpl implements RestService {
             return new Gson().fromJson(new BufferedReader(new InputStreamReader(response.getEntity().getContent())), Token.class);
         } catch (MaxymiserRestException e) {
             throw new MaxymiserRestException("Authentication error", e);
+        } catch (HttpHostConnectException e) {
+            throw new MaxymiserRestException("Unable to connect", e);
         } catch (Exception e) {
             throw new MaxymiserRestException("Unexpected error", e);
         } finally {
@@ -187,6 +195,21 @@ public class RestServiceImpl implements RestService {
                 }
             }
         }
+    }
+
+    private RequestConfig createRequestConfig(String proxy) throws URISyntaxException {
+        RequestConfig.Builder builder = RequestConfig.copy(RequestConfig.DEFAULT);
+
+        if (StringUtils.isNotBlank(proxy)) {
+            URI proxyUri = new URI(proxy);
+            builder.setProxy(new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme()));
+        }
+
+        builder.setConnectionRequestTimeout(10 * 1000);
+        builder.setConnectTimeout(10 * 1000);
+        builder.setSocketTimeout(10 * 1000);
+
+        return builder.build();
     }
 
     private void checkResponse(HttpResponse response) throws MaxymiserRestException {
@@ -232,7 +255,8 @@ public class RestServiceImpl implements RestService {
                 this.applicationSettingsService.getLogin(),
                 this.applicationSettingsService.getPassword(),
                 this.applicationSettingsService.getClientId(),
-                this.applicationSettingsService.getClientSecret()
+                this.applicationSettingsService.getClientSecret(),
+                this.applicationSettingsService.getProxy()
         );
 
         this.tokenExpiration = DateUtils.addSeconds(new Date(), this.token.getExpiresIn() / 2);

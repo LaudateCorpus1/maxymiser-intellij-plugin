@@ -48,4 +48,8 @@ public interface ApplicationSettingsService {
 
     void setClientSecret(String clientSecret);
 
+    String getProxy();
+
+    void setProxy(String proxy);
+
 }
